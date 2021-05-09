@@ -1,0 +1,22 @@
+
+# Env
+.env
+
+# Node JS
+node_modules
+
+# Coverage
+coverage*
+coverage.json
+
+# Typechain
+typechain
+
+# Hardhat
+artifacts
+cache
+gasReporterOutput.json
+
+# VS Code
+vscode-user-settings.json
+vscode-workspace-settings.json
