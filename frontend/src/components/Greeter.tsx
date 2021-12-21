@@ -1,50 +1,106 @@
-import React, { useEffect } from 'react';
+import {
+  ChangeEvent,
+  MouseEvent,
+  ReactElement,
+  useEffect,
+  useState
+} from 'react';
 
 import { useWeb3React } from '@web3-react/core';
 
-import { ethers } from 'ethers';
-import { formatEther } from '@ethersproject/units';
-import { Contract } from '@ethersproject/contracts';
+import { ethers, Contract, Signer } from 'ethers';
 
 import GreeterArtifact from '../artifacts/contracts/Greeter.sol/Greeter.json';
 
-import { Provider } from '../ProviderLibrary';
+import { Provider } from '../provider';
 
 const greeterContractAddr = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
 
-export function Greeter() {
+export function Greeter(): ReactElement {
   const context = useWeb3React<Provider>();
   const { library } = context;
 
-  const [greeting, setGreeting] = React.useState<string>();
-  const [greeterContract, setGreeterContract] = React.useState<Contract>();
+  const [signer, setSigner] = useState<Signer>();
+  const [greeterContract, setGreeterContract] = useState<Contract>();
+  const [greeting, setGreeting] = useState<string>('');
+  const [greetingInput, setGreetingInput] = useState<string>('');
 
-  const signer = library?.getSigner(0);
+  useEffect((): void => {
+    if (!library) {
+      setSigner(undefined);
+      return;
+    }
 
-  useEffect(
-    function () {
-      console.log(1);
+    setSigner(library.getSigner());
+  }, [library]);
+
+  useEffect((): void => {
+    async function getGreeterContract() {
       const Greeter = new ethers.ContractFactory(
         GreeterArtifact.abi,
         GreeterArtifact.bytecode,
         signer
       );
 
-      async function getGreeting() {
-        console.log(3);
-        setGreeterContract(await Greeter.attach(greeterContractAddr));
-        setGreeting(await greeterContract?.greet());
-      }
+      setGreeterContract(Greeter.attach(greeterContractAddr));
+    }
 
-      console.log(2);
-      getGreeting();
-    },
-    [greeterContract, greeting, signer]
-  );
+    getGreeterContract();
+  }, [signer]);
+
+  useEffect((): void => {
+    if (!greeterContract) {
+      return;
+    }
+
+    async function getGreeting(greeterContract: Contract): Promise<void> {
+      const _greeting = await greeterContract.greet();
+
+      if (_greeting !== greeting) {
+        setGreeting(_greeting);
+      }
+    }
+
+    getGreeting(greeterContract);
+  }, [greeterContract, greeting]);
+
+  function handleGreetingChange(event: ChangeEvent<HTMLInputElement>) {
+    event.preventDefault();
+    setGreetingInput(event.target.value);
+  }
+
+  function handleGreetingSubmit(event: MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+
+    if (!greeterContract) {
+      throw new Error('Undefined greeterContract');
+    }
+
+    if (!greeting) {
+      throw new Error('Greeting cannot be empty');
+    }
+
+    async function submitGreeting(greeterContract: Contract) {
+      const setGreetingTxn = await greeterContract.setGreeting(greetingInput);
+      await setGreetingTxn.wait();
+      const updatedGreeting = await greeterContract.greet();
+
+      if (updatedGreeting !== greeting) {
+        setGreeting(updatedGreeting);
+      }
+    }
+
+    submitGreeting(greeterContract);
+  }
 
   return (
     <>
-      <h1>Greeting: {greeting}</h1>
+      <div>Greeting: {greeting}</div>
+      <div>
+        Set new greeting:
+        <input type="text" onChange={handleGreetingChange}></input>
+        <button onClick={handleGreetingSubmit}>Submit</button>
+      </div>
     </>
   );
 }

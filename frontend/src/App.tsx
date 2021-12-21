@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { useWeb3React, UnsupportedChainIdError } from '@web3-react/core';
 import {
   NoEthereumProviderError,
   UserRejectedRequestError as UserRejectedRequestErrorInjected
 } from '@web3-react/injected-connector';
-import { Provider } from './ProviderLibrary';
+import { Provider } from './provider';
 
 import { Greeter } from './components/Greeter';
 import { Header } from './components/Header';
@@ -13,7 +13,7 @@ import { Spinner } from './components/Spinner';
 import { injected } from './connectors';
 import { useEagerConnect, useInactiveListener } from './hooks';
 
-function getErrorMessage(error: Error) {
+function getErrorMessage(error: Error): string {
   if (error instanceof NoEthereumProviderError) {
     return 'No Ethereum browser extension detected, install MetaMask on desktop or visit from a dApp browser on mobile.';
   } else if (error instanceof UnsupportedChainIdError) {
@@ -26,24 +26,26 @@ function getErrorMessage(error: Error) {
   }
 }
 
-export function App() {
+const injectorName = 'Injected';
+
+export function App(): ReactElement {
   const context = useWeb3React<Provider>();
   const { connector, library, account, activate, deactivate, active, error } =
     context;
 
   // handle logic to recognize the connector currently being activated
   const [activatingConnector, setActivatingConnector] = React.useState<any>();
-  React.useEffect(() => {
+  React.useEffect((): void => {
     if (activatingConnector && activatingConnector === connector) {
       setActivatingConnector(undefined);
     }
   }, [activatingConnector, connector]);
 
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
-  const triedEager = useEagerConnect();
+  const eagerConnectionSuccessful = useEagerConnect();
 
   // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
-  useInactiveListener(!triedEager || !!activatingConnector);
+  useInactiveListener(!eagerConnectionSuccessful || !!activatingConnector);
 
   const injectorName = 'Injected';
 
@@ -64,7 +66,10 @@ export function App() {
           const activating = injected === activatingConnector;
           const connected = injected === connector;
           const disabled =
-            !triedEager || !!activatingConnector || connected || !!error;
+            !eagerConnectionSuccessful ||
+            !!activatingConnector ||
+            connected ||
+            !!error;
 
           return (
             <button

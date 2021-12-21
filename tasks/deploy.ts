@@ -4,7 +4,7 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import '@nomiclabs/hardhat-waffle';
 
 task('deploy', 'Deploy Greeter contract').setAction(
-  async (_, hre: HardhatRuntimeEnvironment) => {
+  async (_, hre: HardhatRuntimeEnvironment): Promise<void> => {
     const Greeter = await hre.ethers.getContractFactory('Greeter');
     const greeter = await Greeter.deploy('Hello, Hardhat!');
 

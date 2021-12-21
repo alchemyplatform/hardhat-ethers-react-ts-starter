@@ -6,11 +6,11 @@ import { Web3ReactProvider } from '@web3-react/core';
 import './index.css';
 
 import { App } from './App';
-import { getLibrary } from './ProviderLibrary';
+import { getProvider } from './provider';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Web3ReactProvider getLibrary={getLibrary}>
+    <Web3ReactProvider getLibrary={getProvider}>
       <App />
     </Web3ReactProvider>
   </React.StrictMode>,
