@@ -3,7 +3,7 @@ import type { Web3Provider as ProviderType } from '@ethersproject/providers';
 
 export function getProvider(_provider: any): ProviderType {
   const provider = new Web3Provider(_provider);
-  provider.pollingInterval = 12000;
+  provider.pollingInterval = 1000;
   return provider;
 }
 

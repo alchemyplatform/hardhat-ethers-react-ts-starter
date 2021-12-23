@@ -1,7 +1,10 @@
+import { ReactElement, useEffect, useState } from 'react';
+
 import { useWeb3React } from '@web3-react/core';
 
 import { ethers } from 'ethers';
-import { ReactElement, useEffect, useState } from 'react';
+
+import styled from 'styled-components';
 
 import { Provider } from '../provider';
 
@@ -138,15 +141,17 @@ function Balance(): ReactElement {
   );
 }
 
+const StyledHeader = styled.div``;
+
 export function Header(): ReactElement {
   const { active, error } = useWeb3React<Provider>();
 
   return (
-    <>
+    <StyledHeader>
       <h1 style={{ margin: '1rem', textAlign: 'right' }}>
         {active ? '🟢' : error ? '🔴' : '🟠'}
       </h1>
-      <h3
+      {/* <h3
         style={{
           display: 'grid',
           gridGap: '1rem',
@@ -160,7 +165,7 @@ export function Header(): ReactElement {
         <BlockNumber />
         <Account />
         <Balance />
-      </h3>
-    </>
+      </h3> */}
+    </StyledHeader>
   );
 }

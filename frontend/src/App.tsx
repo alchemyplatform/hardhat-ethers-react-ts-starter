@@ -4,11 +4,16 @@ import {
   NoEthereumProviderError,
   UserRejectedRequestError as UserRejectedRequestErrorInjected
 } from '@web3-react/injected-connector';
+
+import styled from 'styled-components';
+
 import { Provider } from './provider';
 
 import { Greeter } from './components/Greeter';
 import { Header } from './components/Header';
+import { SectionDivider } from './components/SectionDivider';
 import { Spinner } from './components/Spinner';
+import { SignMessage } from './components/SignMessage';
 
 import { injected } from './connectors';
 import { useEagerConnect, useInactiveListener } from './hooks';
@@ -26,12 +31,14 @@ function getErrorMessage(error: Error): string {
   }
 }
 
-const injectorName = 'Injected';
+const StyledApp = styled.div`
+  display: grid;
+  grid-gap: 20px;
+`;
 
 export function App(): ReactElement {
   const context = useWeb3React<Provider>();
-  const { connector, library, account, activate, deactivate, active, error } =
-    context;
+  const { connector, activate, deactivate, active, error } = context;
 
   // handle logic to recognize the connector currently being activated
   const [activatingConnector, setActivatingConnector] = React.useState<any>();
@@ -47,13 +54,11 @@ export function App(): ReactElement {
   // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
   useInactiveListener(!eagerConnectionSuccessful || !!activatingConnector);
 
-  const injectorName = 'Injected';
-
   return (
-    <>
+    <StyledApp>
       <Header />
-      <hr style={{ margin: '2rem' }} />
-      <div
+      <SectionDivider />
+      {/* <div
         style={{
           display: 'grid',
           gridGap: '1rem',
@@ -74,7 +79,7 @@ export function App(): ReactElement {
           return (
             <button
               style={{
-                height: '3rem',
+                height: '2rem',
                 borderRadius: '1rem',
                 borderColor: activating
                   ? 'orange'
@@ -124,7 +129,7 @@ export function App(): ReactElement {
             (active || error) && (
               <button
                 style={{
-                  height: '3rem',
+                  height: '2rem',
                   marginTop: '2rem',
                   borderRadius: '1rem',
                   borderColor: 'red',
@@ -149,47 +154,10 @@ export function App(): ReactElement {
           );
         })()}
       </div>
-
-      <hr style={{ margin: '2rem' }} />
-
-      <div
-        style={{
-          display: 'grid',
-          gridGap: '1rem',
-          gridTemplateColumns: 'fit-content',
-          maxWidth: '20rem',
-          margin: 'auto'
-        }}
-      >
-        {!!(library && account) && (
-          <button
-            style={{
-              height: '3rem',
-              borderRadius: '1rem',
-              cursor: 'pointer'
-            }}
-            onClick={() => {
-              library
-                .getSigner(account)
-                .signMessage('👋')
-                .then((signature: any) => {
-                  window.alert(`Success!\n\n${signature}`);
-                })
-                .catch((error: any) => {
-                  window.alert(
-                    'Failure!' +
-                      (error && error.message ? `\n\n${error.message}` : '')
-                  );
-                });
-            }}
-          >
-            Sign Message
-          </button>
-        )}
-      </div>
-
-      <hr style={{ margin: '2rem' }} />
-      <Greeter></Greeter>
-    </>
+      <HorizontalRule />*/}
+      <SignMessage />
+      <SectionDivider />
+      <Greeter />
+    </StyledApp>
   );
 }
