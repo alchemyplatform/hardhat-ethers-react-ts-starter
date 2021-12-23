@@ -6,7 +6,7 @@ import { Web3ReactProvider } from '@web3-react/core';
 import './index.css';
 
 import { App } from './App';
-import { getProvider } from './provider';
+import { getProvider } from './utils/provider';
 
 ReactDOM.render(
   <React.StrictMode>

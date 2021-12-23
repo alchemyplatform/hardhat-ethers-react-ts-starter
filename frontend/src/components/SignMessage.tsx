@@ -4,30 +4,16 @@ import { useWeb3React } from '@web3-react/core';
 
 import styled from 'styled-components';
 
-import { Provider } from '../provider';
-
-// const StyledSignMessage = styled.div``;
+import { Provider } from '../utils/provider';
 
 const StyledButton = styled.button`
   width: 150px;
   height: 2rem;
   border-radius: 1rem;
-  border-color: green;
+  border-color: blue;
   cursor: pointer;
   place-self: center;
 `;
-
-/*
-      <div
-        style={{
-          display: 'grid',
-          gridGap: '1rem',
-          gridTemplateColumns: 'fit-content',
-          maxWidth: '20rem',
-          margin: 'auto'
-        }}
-      >
-      */
 
 export function SignMessage(): ReactElement {
   const context = useWeb3React<Provider>();

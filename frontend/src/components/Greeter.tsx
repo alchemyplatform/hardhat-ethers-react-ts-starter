@@ -14,7 +14,7 @@ import styled from 'styled-components';
 
 import GreeterArtifact from '../artifacts/contracts/Greeter.sol/Greeter.json';
 
-import { Provider } from '../provider';
+import { Provider } from '../utils/provider';
 
 const greeterContractAddr = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
 
@@ -27,7 +27,7 @@ const StyledGreetingDiv = styled.div`
   align-items: center;
 `;
 
-const CurrentGreetingLabel = styled.label`
+const StyledLabel = styled.label`
   font-weight: bold;
 `;
 
@@ -38,10 +38,6 @@ const CurrentGreeting = styled.input.attrs(() => ({ type: 'text' }))`
   border-style: none;
 `;
 
-const SetNewGreetingLabel = styled.label`
-  font-weight: bold;
-`;
-
 const StyledTextInput = styled.input.attrs(() => ({ type: 'text' }))`
   width: auto;
 `;
@@ -50,7 +46,7 @@ const StyledButton = styled.button`
   width: 150px;
   height: 2rem;
   border-radius: 1rem;
-  border-color: green;
+  border-color: blue;
   cursor: pointer;
 `;
 
@@ -115,7 +111,7 @@ export function Greeter(): ReactElement {
       return;
     }
 
-    if (!greeting) {
+    if (!greetingInput) {
       window.alert('Greeting cannot be empty');
       return;
     }
@@ -146,9 +142,7 @@ export function Greeter(): ReactElement {
 
   return (
     <StyledGreetingDiv>
-      <CurrentGreetingLabel htmlFor="greeting">
-        Current greeting
-      </CurrentGreetingLabel>
+      <StyledLabel htmlFor="greeting">Current greeting</StyledLabel>
       <CurrentGreeting
         id="greeting"
         type="text"
@@ -157,9 +151,7 @@ export function Greeter(): ReactElement {
       />
       {/* empty placeholder div below to provide empty first row, 3rd col div for a 2x3 grid */}
       <div></div>
-      <SetNewGreetingLabel htmlFor="greetingInput">
-        Set new greeting
-      </SetNewGreetingLabel>
+      <StyledLabel htmlFor="greetingInput">Set new greeting</StyledLabel>
       <StyledTextInput
         id="greetingInput"
         type="text"

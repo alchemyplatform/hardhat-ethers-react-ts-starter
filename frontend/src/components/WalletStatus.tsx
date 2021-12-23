@@ -6,7 +6,18 @@ import { ethers } from 'ethers';
 
 import styled from 'styled-components';
 
-import { Provider } from '../provider';
+import { Provider } from '../utils/provider';
+
+const StyledWalletStatusDiv = styled.div`
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: .6fr .1fr .7fr 1fr .1fr .7fr .5fr .1fr 1.3fr .4fr .1fr 1.3fr .1fr;
+  grid-gap: 10px;
+  place-self: center;
+  align-items: center;
+`;
+
+const StyledStatusIcon = styled.div``;
 
 function ChainId(): ReactElement {
   const { chainId } = useWeb3React<Provider>();
@@ -96,7 +107,7 @@ function Account(): ReactElement {
 function Balance(): ReactElement {
   const { account, library, chainId } = useWeb3React<Provider>();
 
-  const [balance, setBalance] = useState();
+  const [balance, setBalance] = useState<ethers.BigNumber>();
   useEffect((): (() => void) | undefined => {
     if (!account || !library) {
       return;
@@ -106,7 +117,7 @@ function Balance(): ReactElement {
 
     library
       .getBalance(account)
-      .then((balance: any) => {
+      .then((balance: ethers.BigNumber) => {
         if (!stale) {
           setBalance(balance);
         }
@@ -134,24 +145,22 @@ function Balance(): ReactElement {
         {balance === null
           ? 'Error'
           : balance
-          ? `Ξ${ethers.utils.formatEther(balance)}`
+          ? `Ξ${Math.round(+ethers.utils.formatEther(balance) * 1e4) / 1e4}`
           : ''}
       </span>
     </>
   );
 }
 
-const StyledHeader = styled.div``;
+function StatusIcon(): ReactElement {
+  const { account, active, error, library, chainId } = useWeb3React<Provider>();
 
-export function Header(): ReactElement {
-  const { active, error } = useWeb3React<Provider>();
-
-  return (
-    <StyledHeader>
+return (
+  <StyledStatusIcon>
       <h1 style={{ margin: '1rem', textAlign: 'right' }}>
         {active ? '🟢' : error ? '🔴' : '🟠'}
       </h1>
-      {/* <h3
+      <h3
         style={{
           display: 'grid',
           gridGap: '1rem',
@@ -161,11 +170,20 @@ export function Header(): ReactElement {
           margin: 'auto'
         }}
       >
+      </h3>
+      </StyledStatusIcon>);
+}
+
+export function WalletStatus(): ReactElement {
+  const { active, error } = useWeb3React<Provider>();
+
+  return (
+    <StyledWalletStatusDiv>
         <ChainId />
         <BlockNumber />
         <Account />
         <Balance />
-      </h3> */}
-    </StyledHeader>
+        <StatusIcon />
+    </StyledWalletStatusDiv>
   );
 }
