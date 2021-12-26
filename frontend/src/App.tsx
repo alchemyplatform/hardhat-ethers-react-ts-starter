@@ -16,7 +16,7 @@ const StyledAppDiv = styled.div`
 export function App(): ReactElement {
   return (
     <StyledAppDiv>
-      <ActivateDeactivate></ActivateDeactivate>
+      <ActivateDeactivate />
       <SectionDivider />
       <WalletStatus />
       <SectionDivider />

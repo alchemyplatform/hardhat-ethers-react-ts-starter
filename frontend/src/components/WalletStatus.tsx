@@ -17,14 +17,12 @@ const StyledWalletStatusDiv = styled.div`
   align-items: center;
 `;
 
-const StyledStatusIcon = styled.div``;
-
 function ChainId(): ReactElement {
   const { chainId } = useWeb3React<Provider>();
 
   return (
     <>
-      <span>Chain Id</span>
+      <span><strong>Chain Id</strong></span>
       <span role="img" aria-label="chain">
         ⛓
       </span>
@@ -73,7 +71,7 @@ function BlockNumber(): ReactElement {
 
   return (
     <>
-      <span>Block Number</span>
+      <span><strong>Block Number</strong></span>
       <span role="img" aria-label="numbers">
         🔢
       </span>
@@ -87,7 +85,7 @@ function Account(): ReactElement {
 
   return (
     <>
-      <span>Account</span>
+      <span><strong>Account</strong></span>
       <span role="img" aria-label="robot">
         🤖
       </span>
@@ -108,6 +106,7 @@ function Balance(): ReactElement {
   const { account, library, chainId } = useWeb3React<Provider>();
 
   const [balance, setBalance] = useState<ethers.BigNumber>();
+  
   useEffect((): (() => void) | undefined => {
     if (!account || !library) {
       return;
@@ -137,7 +136,7 @@ function Balance(): ReactElement {
 
   return (
     <>
-      <span>Balance</span>
+      <span><strong>Balance</strong></span>
       <span role="img" aria-label="gold">
         💰
       </span>
@@ -153,30 +152,14 @@ function Balance(): ReactElement {
 }
 
 function StatusIcon(): ReactElement {
-  const { account, active, error, library, chainId } = useWeb3React<Provider>();
+  const { active, error } = useWeb3React<Provider>();
 
-return (
-  <StyledStatusIcon>
-      <h1 style={{ margin: '1rem', textAlign: 'right' }}>
-        {active ? '🟢' : error ? '🔴' : '🟠'}
-      </h1>
-      <h3
-        style={{
-          display: 'grid',
-          gridGap: '1rem',
-          gridTemplateColumns: '1fr min-content 1fr',
-          maxWidth: '20rem',
-          lineHeight: '2rem',
-          margin: 'auto'
-        }}
-      >
-      </h3>
-      </StyledStatusIcon>);
+  return (
+    <h1>{active ? '🟢' : error ? '🔴' : '🟠'}</h1>
+  );
 }
 
 export function WalletStatus(): ReactElement {
-  const { active, error } = useWeb3React<Provider>();
-
   return (
     <StyledWalletStatusDiv>
         <ChainId />

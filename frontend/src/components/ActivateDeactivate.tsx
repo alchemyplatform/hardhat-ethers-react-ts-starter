@@ -13,7 +13,6 @@ import { injected } from '../utils/connectors';
 import { useEagerConnect, useInactiveListener } from '../utils/hooks';
 import { Provider } from '../utils/provider';
 
-import { Spinner } from './Spinner';
 import { AbstractConnector } from '@web3-react/abstract-connector';
 
 type ActivateFunction = (
@@ -23,16 +22,23 @@ type ActivateFunction = (
 ) => Promise<void>;
 
 function getErrorMessage(error: Error): string {
-  if (error instanceof NoEthereumProviderError) {
-    return 'No Ethereum browser extension detected, install MetaMask on desktop or visit from a dApp browser on mobile.';
-  } else if (error instanceof UnsupportedChainIdError) {
-    return "You're connected to an unsupported network.";
-  } else if (error instanceof UserRejectedRequestError) {
-    return 'Please authorize this website to access your Ethereum account.';
-  } else {
-    console.error(error);
-    return 'An unknown error occurred. Check the console for more details.';
+  let errorMessage: string;
+
+  switch (error.constructor) {
+    case NoEthereumProviderError:
+      errorMessage = `No Ethereum browser extension detected. Please install MetaMask extension.`;
+      break;
+    case UnsupportedChainIdError:
+      errorMessage = `You're connected to an unsupported network.`;
+      break;
+    case UserRejectedRequestError:
+      errorMessage = `Please authorize this website to access your Ethereum account.`;
+      break;
+    default:
+      errorMessage = error.message;
   }
+
+  return errorMessage;
 }
 
 const StyledActivateDeactivateDiv = styled.div`
@@ -69,7 +75,7 @@ function Activate(): ReactElement {
   function handleActivate(event: MouseEvent<HTMLButtonElement>): void {
     event.preventDefault();
 
-    async function _activate(activate: ActivateFunction) {
+    async function _activate(activate: ActivateFunction): Promise<void> {
       setActivating(true);
       await activate(injected);
       setActivating(false);
@@ -85,31 +91,6 @@ function Activate(): ReactElement {
   // handle logic to connect in reaction to certain events on the injected ethereum provider,
   // if it exists
   useInactiveListener(!eagerConnectionSuccessful);
-
-  //             <div
-  //               style={{
-  //                 position: 'absolute',
-  //                 top: '0',
-  //                 left: '0',
-  //                 height: '100%',
-  //                 display: 'flex',
-  //                 alignItems: 'center',
-  //                 color: 'black',
-  //                 margin: '0 0 0 1rem'
-  //               }}
-  //             >
-  //               {activating && (
-  //                 <Spinner
-  //                   color={'black'}
-  //                   style={{ height: '25%', marginLeft: '-1rem' }}
-  //                 />
-  //               )}
-  //               {connected && (
-  //                 <span role="img" aria-label="check">
-  //                   ✅
-  //                 </span>
-  //               )}
-  //             </div>
 
   return (
     <StyledActivateButton

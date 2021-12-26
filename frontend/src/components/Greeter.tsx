@@ -16,6 +16,7 @@ import GreeterArtifact from '../artifacts/contracts/Greeter.sol/Greeter.json';
 
 import { Provider } from '../utils/provider';
 
+// TODO
 const greeterContractAddr = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
 
 const StyledGreetingDiv = styled.div`
