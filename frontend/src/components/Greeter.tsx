@@ -16,13 +16,21 @@ import GreeterArtifact from '../artifacts/contracts/Greeter.sol/Greeter.json';
 
 import { Provider } from '../utils/provider';
 
-// TODO
-const greeterContractAddr = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+import { SectionDivider } from './SectionDivider';
+
+const StyledDeployContractButton = styled.button`
+  width: 180px;
+  height: 2rem;
+  border-radius: 1rem;
+  border-color: blue;
+  cursor: pointer;
+  place-self: center;
+`;
 
 const StyledGreetingDiv = styled.div`
   display: grid;
-  grid-template-rows: 1fr 1fr;
-  grid-template-columns: 135px 1.3fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-columns: 135px 2.7fr 1fr;
   grid-gap: 10px;
   place-self: center;
   align-items: center;
@@ -32,15 +40,9 @@ const StyledLabel = styled.label`
   font-weight: bold;
 `;
 
-const CurrentGreeting = styled.input.attrs(() => ({ type: 'text' }))`
-  color: blue;
-  font-weight: bold;
-  font-size: 1.2rem;
-  border-style: none;
-`;
-
-const StyledTextInput = styled.input.attrs(() => ({ type: 'text' }))`
-  width: auto;
+const StyledInput = styled.input`
+  padding: 0.4rem 0.6rem;
+  line-height: 2fr;
 `;
 
 const StyledButton = styled.button`
@@ -53,10 +55,11 @@ const StyledButton = styled.button`
 
 export function Greeter(): ReactElement {
   const context = useWeb3React<Provider>();
-  const { library } = context;
+  const { library, active } = context;
 
   const [signer, setSigner] = useState<Signer>();
   const [greeterContract, setGreeterContract] = useState<Contract>();
+  const [greeterContractAddr, setGreeterContractAddr] = useState<string>('');
   const [greeting, setGreeting] = useState<string>('');
   const [greetingInput, setGreetingInput] = useState<string>('');
 
@@ -68,20 +71,6 @@ export function Greeter(): ReactElement {
 
     setSigner(library.getSigner());
   }, [library]);
-
-  useEffect((): void => {
-    async function getGreeterContract(): Promise<void> {
-      const Greeter = new ethers.ContractFactory(
-        GreeterArtifact.abi,
-        GreeterArtifact.bytecode,
-        signer
-      );
-
-      setGreeterContract(Greeter.attach(greeterContractAddr));
-    }
-
-    getGreeterContract();
-  }, [signer]);
 
   useEffect((): void => {
     if (!greeterContract) {
@@ -98,6 +87,44 @@ export function Greeter(): ReactElement {
 
     getGreeting(greeterContract);
   }, [greeterContract, greeting]);
+
+  function handleDeployContract(event: MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+
+    // only deploy the Greeter contract one time, when a signer is defined
+    if (greeterContract || !signer) {
+      return;
+    }
+
+    async function deployGreeterContract(signer: Signer): Promise<void> {
+      const Greeter = new ethers.ContractFactory(
+        GreeterArtifact.abi,
+        GreeterArtifact.bytecode,
+        signer
+      );
+
+      try {
+        const greeterContract = await Greeter.deploy('Hello, Hardhat!');
+
+        await greeterContract.deployed();
+
+        const greeting = await greeterContract.greet();
+
+        setGreeterContract(greeterContract);
+        setGreeting(greeting);
+
+        window.alert(`Greeter deployed to: ${greeterContract.address}`);
+
+        setGreeterContractAddr(greeterContract.address);
+      } catch (error: any) {
+        window.alert(
+          'Error!' + (error && error.message ? `\n\n${error.message}` : '')
+        );
+      }
+    }
+
+    deployGreeterContract(signer);
+  }
 
   function handleGreetingChange(event: ChangeEvent<HTMLInputElement>): void {
     event.preventDefault();
@@ -118,23 +145,21 @@ export function Greeter(): ReactElement {
     }
 
     async function submitGreeting(greeterContract: Contract): Promise<void> {
-      let setGreetingTxn;
-
       try {
-        setGreetingTxn = await greeterContract.setGreeting(greetingInput);
+        const setGreetingTxn = await greeterContract.setGreeting(greetingInput);
+
+        await setGreetingTxn.wait();
+
+        const newGreeting = await greeterContract.greet();
+        window.alert(`Success!\n\nGreeting is now: ${newGreeting}`);
+
+        if (newGreeting !== greeting) {
+          setGreeting(newGreeting);
+        }
       } catch (error: any) {
         window.alert(
-          'Failure!' + (error && error.message ? `\n\n${error.message}` : '')
+          'Error!' + (error && error.message ? `\n\n${error.message}` : '')
         );
-
-        return;
-      }
-
-      await setGreetingTxn.wait();
-      const updatedGreeting = await greeterContract.greet();
-
-      if (updatedGreeting !== greeting) {
-        setGreeting(updatedGreeting);
       }
     }
 
@@ -142,23 +167,54 @@ export function Greeter(): ReactElement {
   }
 
   return (
-    <StyledGreetingDiv>
-      <StyledLabel htmlFor="greeting">Current greeting</StyledLabel>
-      <CurrentGreeting
-        id="greeting"
-        type="text"
-        readOnly={true}
-        value={greeting}
-      />
-      {/* empty placeholder div below to provide empty first row, 3rd col div for a 2x3 grid */}
-      <div></div>
-      <StyledLabel htmlFor="greetingInput">Set new greeting</StyledLabel>
-      <StyledTextInput
-        id="greetingInput"
-        type="text"
-        onChange={handleGreetingChange}
-      />
-      <StyledButton onClick={handleGreetingSubmit}>Submit</StyledButton>
-    </StyledGreetingDiv>
+    <>
+      <StyledDeployContractButton
+        disabled={!active || greeterContract ? true : false}
+        style={{
+          cursor: !active || greeterContract ? 'not-allowed' : 'pointer',
+          borderColor: !active || greeterContract ? 'unset' : 'blue'
+        }}
+        onClick={handleDeployContract}
+      >
+        Deploy Greeter Contract
+      </StyledDeployContractButton>
+      <SectionDivider />
+      <StyledGreetingDiv>
+        <StyledLabel>Contract Addr</StyledLabel>
+        <div>
+          {greeterContractAddr ? (
+            greeterContractAddr
+          ) : (
+            <em>{`<Contract not yet deployed>`}</em>
+          )}
+        </div>
+        {/* empty placeholder div below to provide empty first row, 3rd col div for a 2x3 grid */}
+        <div></div>
+        <StyledLabel>Current greeting</StyledLabel>
+        <div>
+          {greeting ? greeting : <em>{`<Contract not yet deployed>`}</em>}
+        </div>
+        {/* empty placeholder div below to provide empty first row, 3rd col div for a 2x3 grid */}
+        <div></div>
+        <StyledLabel htmlFor="greetingInput">Set new greeting</StyledLabel>
+        <StyledInput
+          id="greetingInput"
+          type="text"
+          placeholder={greeting ? '' : '<Contract not yet deployed>'}
+          onChange={handleGreetingChange}
+          style={{ fontStyle: greeting ? 'normal' : 'italic' }}
+        ></StyledInput>
+        <StyledButton
+          disabled={!active || !greeterContract ? true : false}
+          style={{
+            cursor: !active || !greeterContract ? 'not-allowed' : 'pointer',
+            borderColor: !active || !greeterContract ? 'unset' : 'blue'
+          }}
+          onClick={handleGreetingSubmit}
+        >
+          Submit
+        </StyledButton>
+      </StyledGreetingDiv>
+    </>
   );
 }

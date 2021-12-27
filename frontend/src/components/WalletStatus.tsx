@@ -11,7 +11,7 @@ import { Provider } from '../utils/provider';
 const StyledWalletStatusDiv = styled.div`
   display: grid;
   grid-template-rows: 1fr;
-  grid-template-columns: .6fr .1fr .7fr 1fr .1fr .7fr .5fr .1fr 1.3fr .4fr .1fr 1.3fr .1fr;
+  grid-template-columns: 0.6fr 0.1fr 0.6fr 1fr 0.1fr 0.6fr 0.5fr 0.1fr 1.1fr 0.4fr 0.1fr 1fr 0.9fr 0.1fr 0.7fr 0.1fr;
   grid-gap: 10px;
   place-self: center;
   align-items: center;
@@ -22,7 +22,9 @@ function ChainId(): ReactElement {
 
   return (
     <>
-      <span><strong>Chain Id</strong></span>
+      <span>
+        <strong>Chain Id</strong>
+      </span>
       <span role="img" aria-label="chain">
         ⛓
       </span>
@@ -45,21 +47,25 @@ function BlockNumber(): ReactElement {
 
     async function getBlockNumber(library: Provider): Promise<void> {
       try {
-        const blockNumber = await library.getBlockNumber();
+        const blockNumber: number = await library.getBlockNumber();
 
         if (!stale) {
           setBlockNumber(blockNumber);
         }
-      } catch (_: any) {
+      } catch (error: any) {
         if (!stale) {
           setBlockNumber(undefined);
         }
-      }
 
-      library.on('block', setBlockNumber);
+        window.alert(
+          'Error!' + (error && error.message ? `\n\n${error.message}` : '')
+        );
+      }
     }
 
     getBlockNumber(library);
+
+    library.on('block', setBlockNumber);
 
     // cleanup function
     return (): void => {
@@ -71,7 +77,9 @@ function BlockNumber(): ReactElement {
 
   return (
     <>
-      <span><strong>Block Number</strong></span>
+      <span>
+        <strong>Block Number</strong>
+      </span>
       <span role="img" aria-label="numbers">
         🔢
       </span>
@@ -85,13 +93,15 @@ function Account(): ReactElement {
 
   return (
     <>
-      <span><strong>Account</strong></span>
+      <span>
+        <strong>Account</strong>
+      </span>
       <span role="img" aria-label="robot">
         🤖
       </span>
       <span>
-        {account === null
-          ? '-'
+        {typeof account === 'undefined'
+          ? ''
           : account
           ? `${account.substring(0, 6)}...${account.substring(
               account.length - 4
@@ -106,37 +116,58 @@ function Balance(): ReactElement {
   const { account, library, chainId } = useWeb3React<Provider>();
 
   const [balance, setBalance] = useState<ethers.BigNumber>();
-  
+
   useEffect((): (() => void) | undefined => {
-    if (!account || !library) {
+    if (typeof account === 'undefined' || account === null || !library) {
       return;
     }
 
     let stale = false;
 
-    library
-      .getBalance(account)
-      .then((balance: ethers.BigNumber) => {
+    async function getBalance(
+      library: Provider,
+      account: string
+    ): Promise<void> {
+      const balance: ethers.BigNumber = await library.getBalance(account);
+
+      try {
         if (!stale) {
           setBalance(balance);
         }
-      })
-      .catch(() => {
+      } catch (error: any) {
         if (!stale) {
           setBalance(undefined);
+
+          window.alert(
+            'Error!' + (error && error.message ? `\n\n${error.message}` : '')
+          );
         }
-      });
+      }
+    }
+
+    getBalance(library, account);
+
+    // create a named balancer handler function to fetch the balance each block. in the
+    // cleanup function use the fucntion name to remove the listener
+    const getBalanceHandler = () => {
+      getBalance(library, account);
+    };
+
+    library.on('block', getBalanceHandler);
 
     // cleanup function
     return (): void => {
       stale = true;
+      library.removeListener('block', getBalanceHandler);
       setBalance(undefined);
     };
   }, [account, library, chainId]); // ensures refresh if referential identity of library doesn't change across chainIds
 
   return (
     <>
-      <span><strong>Balance</strong></span>
+      <span>
+        <strong>Balance</strong>
+      </span>
       <span role="img" aria-label="gold">
         💰
       </span>
@@ -151,22 +182,91 @@ function Balance(): ReactElement {
   );
 }
 
+// nonce: aka 'transaction count'
+function NextNonce(): ReactElement {
+  const { account, library, chainId } = useWeb3React<Provider>();
+
+  const [nextNonce, setNextNonce] = useState<number>();
+
+  useEffect((): (() => void) | undefined => {
+    if (typeof account === 'undefined' || account === null || !library) {
+      return;
+    }
+
+    let stale = false;
+
+    async function getNextNonce(
+      library: Provider,
+      account: string
+    ): Promise<void> {
+      const nextNonce: number = await library.getTransactionCount(account);
+
+      try {
+        if (!stale) {
+          setNextNonce(nextNonce);
+        }
+      } catch (error: any) {
+        if (!stale) {
+          setNextNonce(undefined);
+
+          window.alert(
+            'Error!' + (error && error.message ? `\n\n${error.message}` : '')
+          );
+        }
+      }
+    }
+
+    getNextNonce(library, account);
+
+    // create a named next nonce handler function to fetch the next nonce each block.
+    // in the cleanup function use the fucntion name to remove the listener
+    const getNextNonceHandler = () => {
+      getNextNonce(library, account);
+    };
+
+    library.on('block', getNextNonceHandler);
+
+    // cleanup function
+    return (): void => {
+      stale = true;
+      setNextNonce(undefined);
+    };
+  }, [account, library, chainId]); // ensures refresh if referential identity of library doesn't change across chainIds
+
+  return (
+    <>
+      <span>
+        <strong>Next Nonce</strong>
+      </span>
+      <span role="img" aria-label="gold">
+        #️⃣
+      </span>
+      <span>{nextNonce === null ? 'Error' : nextNonce ?? ''}</span>
+    </>
+  );
+}
+
+const StyledStatusIcon = styled.h1`
+  margin: 0px;
+`;
+
 function StatusIcon(): ReactElement {
   const { active, error } = useWeb3React<Provider>();
 
   return (
-    <h1>{active ? '🟢' : error ? '🔴' : '🟠'}</h1>
+    <StyledStatusIcon>{active ? '🟢' : error ? '🔴' : '🟠'}</StyledStatusIcon>
   );
 }
 
 export function WalletStatus(): ReactElement {
   return (
     <StyledWalletStatusDiv>
-        <ChainId />
-        <BlockNumber />
-        <Account />
-        <Balance />
-        <StatusIcon />
+      <ChainId />
+      <BlockNumber />
+      <Account />
+      <Balance />
+      <NextNonce />
+      <StatusIcon />
     </StyledWalletStatusDiv>
   );
 }

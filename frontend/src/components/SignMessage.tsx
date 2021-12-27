@@ -17,7 +17,7 @@ const StyledButton = styled.button`
 
 export function SignMessage(): ReactElement {
   const context = useWeb3React<Provider>();
-  const { library, account } = context;
+  const { account, active, library } = context;
 
   function handleSignMessage(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
@@ -36,7 +36,7 @@ export function SignMessage(): ReactElement {
         window.alert(`Success!\n\n${signature}`);
       } catch (error: any) {
         window.alert(
-          'Failure!' + (error && error.message ? `\n\n${error.message}` : '')
+          'Error!' + (error && error.message ? `\n\n${error.message}` : '')
         );
       }
     }
@@ -44,5 +44,16 @@ export function SignMessage(): ReactElement {
     signMessage(library, account);
   }
 
-  return <StyledButton onClick={handleSignMessage}>Sign Message</StyledButton>;
+  return (
+    <StyledButton
+      disabled={!active ? true : false}
+      style={{
+        cursor: !active ? 'not-allowed' : 'pointer',
+        borderColor: !active ? 'unset' : 'blue'
+      }}
+      onClick={handleSignMessage}
+    >
+      Sign Message
+    </StyledButton>
+  );
 }

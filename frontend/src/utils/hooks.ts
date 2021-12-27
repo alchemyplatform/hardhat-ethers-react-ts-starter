@@ -18,8 +18,10 @@ export function useEagerConnect(): boolean {
       if (isAuthorized) {
         try {
           await activate(injected, undefined, true);
-        } catch (_: any) {
-          // no-op
+        } catch (error: any) {
+          window.alert(
+            'Error!' + (error && error.message ? `\n\n${error.message}` : '')
+          );
         }
       }
 

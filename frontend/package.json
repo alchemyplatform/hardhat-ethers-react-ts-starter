@@ -2,6 +2,11 @@
   "name": "frontend",
   "version": "0.1.0",
   "license": "MIT",
+  "description": "Typescript starter template for hardhat, ethers and react projects using typescript and @web3-react",
+  "engines": {
+    "node": "16.13.1",
+    "npm": "8.1.2"
+  },
   "dependencies": {
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.0.0",
