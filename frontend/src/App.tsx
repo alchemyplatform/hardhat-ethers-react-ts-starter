@@ -1,7 +1,5 @@
 import { ReactElement } from 'react';
-
 import styled from 'styled-components';
-
 import { ActivateDeactivate } from './components/ActivateDeactivate';
 import { Greeter } from './components/Greeter';
 import { SectionDivider } from './components/SectionDivider';

@@ -1,9 +1,6 @@
-import { MouseEvent, ReactElement } from 'react';
-
 import { useWeb3React } from '@web3-react/core';
-
+import { MouseEvent, ReactElement } from 'react';
 import styled from 'styled-components';
-
 import { Provider } from '../utils/provider';
 
 const StyledButton = styled.button`
@@ -19,7 +16,7 @@ export function SignMessage(): ReactElement {
   const context = useWeb3React<Provider>();
   const { account, active, library } = context;
 
-  function handleSignMessage(event: MouseEvent<HTMLButtonElement>) {
+  function handleSignMessage(event: MouseEvent<HTMLButtonElement>): void {
     event.preventDefault();
 
     if (!library || !account) {

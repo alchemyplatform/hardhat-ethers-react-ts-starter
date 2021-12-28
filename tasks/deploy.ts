@@ -1,7 +1,6 @@
+import '@nomiclabs/hardhat-waffle';
 import { task } from 'hardhat/config';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
-
-import '@nomiclabs/hardhat-waffle';
 
 task('deploy', 'Deploy Greeter contract').setAction(
   async (_, hre: HardhatRuntimeEnvironment): Promise<void> => {

@@ -1,5 +1,5 @@
-import { Web3Provider } from '@ethersproject/providers';
 import type { Web3Provider as ProviderType } from '@ethersproject/providers';
+import { Web3Provider } from '@ethersproject/providers';
 
 export function getProvider(provider: any): ProviderType {
   const web3Provider = new Web3Provider(provider);

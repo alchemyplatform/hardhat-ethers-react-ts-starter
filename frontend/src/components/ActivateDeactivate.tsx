@@ -1,19 +1,14 @@
-import { MouseEvent, ReactElement, useState } from 'react';
-
-import { useWeb3React, UnsupportedChainIdError } from '@web3-react/core';
-
+import { AbstractConnector } from '@web3-react/abstract-connector';
+import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import {
   NoEthereumProviderError,
   UserRejectedRequestError
 } from '@web3-react/injected-connector';
-
+import { MouseEvent, ReactElement, useState } from 'react';
 import styled from 'styled-components';
-
 import { injected } from '../utils/connectors';
 import { useEagerConnect, useInactiveListener } from '../utils/hooks';
 import { Provider } from '../utils/provider';
-
-import { AbstractConnector } from '@web3-react/abstract-connector';
 
 type ActivateFunction = (
   connector: AbstractConnector,

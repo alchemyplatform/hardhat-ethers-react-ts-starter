@@ -1,47 +1,31 @@
-# Advanced Sample Hardhat Project
+# Starter React Typescript Ethers.js Hardhat Project
 
-This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
+This project is a companion project to [ChainShot](https://www.chainshot.com)'s [How to Build a React Dapp with Hardhat and MetaMask](https://medium.com/p/9cec8f6410d3) Medium article. The project is a starter frontend Dapp that interacts with a `Greeter.sol` smart contract runnning on a local Hardhat node. The smart contract and Hardhat node part of the project were created by installing the Hardhat npm package and bootstrapping a Hardhat project by running: `yarn hardhat init`. For more details you can read more in the [Hardhat README doc](https://github.com/nomiclabs/hardhat).
 
-The project comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts. It also comes with a variety of other tools, preconfigured to work with the project code.
+The Medium article and this GitHub repo are recommended for anyone wanting to build up their web3 skills and are helpful resources for anyone interested in joining any of [ChainShot's bootcamps](https://www.chainshot.com/bootcamp).
 
-Try running some of the following tasks:
+The simple `Greeter.sol` contract allows reading a greeting from the blockchain and setting a new greeting by writing to the blockchain via a transaction. The `Greeter.sol` smart contract aso comes with tests to test the contract. Additonally, this project makes use of Hardhat tasks, uses Typescript, and has uses other standard developer tooling such as eslint and prettier to help ensure code correctness and standarized code formatting.
 
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-npx hardhat help
-REPORT_GAS=true npx hardhat test
-npx hardhat coverage
-npx hardhat run scripts/deploy.ts
-TS_NODE_FILES=true npx ts-node scripts/deploy.ts
-npx eslint '**/*.{js,ts}'
-npx eslint '**/*.{js,ts}' --fix
-npx prettier '**/*.{json,sol,md}' --check
-npx prettier '**/*.{json,sol,md}' --write
-npx solhint 'contracts/**/*.sol'
-npx solhint 'contracts/**/*.sol' --fix
-```
-
-# Etherscan verification
-
-To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.
-
-In this project, copy the .env.example file to a file named .env, and then edit it to fill in the details. Enter your Etherscan API key, your Ropsten node URL (eg from Alchemy), and the private key of the account which will send the deployment transaction. With a valid .env file in place, first deploy your contract:
+Pull this project down from GitHub, cd into the project directory and run the following commands to get setup and running.
 
 ```shell
-hardhat run --network ropsten scripts/sample-script.ts
+yarn
+yarn compile
+yarn hardhat node
 ```
 
-Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
+The commands above will install the project dependencies, compile the sample contract and run a local Hardhat node on port `8545`, using chain id `31337`.
+
+After running the above tasks checkout the frontend [README.md](https://github.com/ChainShot/hardhat-ethers-react-ts-starter/tree/main/frontend/README.md) to run a React Dapp using ethers.js that will interact with the sample contract on the local Hardhat node.
+
+Some other hardhat tasks to try out are:
 
 ```shell
-npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
+yarn hardhat accounts
+yarn hardhat clean
+yarn hardhat compile
+yarn hardhat deploy
+yarn hardhat help
+yarn hardhat node
+yarn hardhat test
 ```
-
-# Performance optimizations
-
-For faster runs of your tests and scripts, consider skipping ts-node's type checking by setting the environment variable `TS_NODE_TRANSPILE_ONLY` to `1` in hardhat's environment. For more details see [the documentation](https://hardhat.org/guides/typescript.html#performance-optimizations).
-# TODO

@@ -1,6 +1,5 @@
-import { useState, useCallback, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
-
+import { useCallback, useEffect, useState } from 'react';
 import { injected } from './connectors';
 import { Provider } from './provider';
 

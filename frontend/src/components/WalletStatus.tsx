@@ -1,12 +1,10 @@
-import { ReactElement, useEffect, useState } from 'react';
-
 import { useWeb3React } from '@web3-react/core';
-
 import { ethers } from 'ethers';
-
+import { ReactElement, useEffect, useState } from 'react';
 import styled from 'styled-components';
-
 import { Provider } from '../utils/provider';
+
+type CleanupFunction = (() => void) | undefined;
 
 const StyledWalletStatusDiv = styled.div`
   display: grid;
@@ -15,6 +13,10 @@ const StyledWalletStatusDiv = styled.div`
   grid-gap: 10px;
   place-self: center;
   align-items: center;
+`;
+
+const StyledStatusIcon = styled.h1`
+  margin: 0px;
 `;
 
 function ChainId(): ReactElement {
@@ -38,7 +40,7 @@ function BlockNumber(): ReactElement {
 
   const [blockNumber, setBlockNumber] = useState<number>();
 
-  useEffect((): (() => void) | undefined => {
+  useEffect((): CleanupFunction => {
     if (!library) {
       return;
     }
@@ -117,7 +119,7 @@ function Balance(): ReactElement {
 
   const [balance, setBalance] = useState<ethers.BigNumber>();
 
-  useEffect((): (() => void) | undefined => {
+  useEffect((): CleanupFunction => {
     if (typeof account === 'undefined' || account === null || !library) {
       return;
     }
@@ -149,7 +151,7 @@ function Balance(): ReactElement {
 
     // create a named balancer handler function to fetch the balance each block. in the
     // cleanup function use the fucntion name to remove the listener
-    const getBalanceHandler = () => {
+    const getBalanceHandler = (): void => {
       getBalance(library, account);
     };
 
@@ -188,7 +190,7 @@ function NextNonce(): ReactElement {
 
   const [nextNonce, setNextNonce] = useState<number>();
 
-  useEffect((): (() => void) | undefined => {
+  useEffect((): CleanupFunction => {
     if (typeof account === 'undefined' || account === null || !library) {
       return;
     }
@@ -220,7 +222,7 @@ function NextNonce(): ReactElement {
 
     // create a named next nonce handler function to fetch the next nonce each block.
     // in the cleanup function use the fucntion name to remove the listener
-    const getNextNonceHandler = () => {
+    const getNextNonceHandler = (): void => {
       getNextNonce(library, account);
     };
 
@@ -245,10 +247,6 @@ function NextNonce(): ReactElement {
     </>
   );
 }
-
-const StyledStatusIcon = styled.h1`
-  margin: 0px;
-`;
 
 function StatusIcon(): ReactElement {
   const { active, error } = useWeb3React<Provider>();

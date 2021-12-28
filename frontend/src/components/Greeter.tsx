@@ -1,3 +1,5 @@
+import { useWeb3React } from '@web3-react/core';
+import { Contract, ethers, Signer } from 'ethers';
 import {
   ChangeEvent,
   MouseEvent,
@@ -5,17 +7,9 @@ import {
   useEffect,
   useState
 } from 'react';
-
-import { useWeb3React } from '@web3-react/core';
-
-import { ethers, Contract, Signer } from 'ethers';
-
 import styled from 'styled-components';
-
 import GreeterArtifact from '../artifacts/contracts/Greeter.sol/Greeter.json';
-
 import { Provider } from '../utils/provider';
-
 import { SectionDivider } from './SectionDivider';
 
 const StyledDeployContractButton = styled.button`
@@ -180,7 +174,7 @@ export function Greeter(): ReactElement {
       </StyledDeployContractButton>
       <SectionDivider />
       <StyledGreetingDiv>
-        <StyledLabel>Contract Addr</StyledLabel>
+        <StyledLabel>Contract addr</StyledLabel>
         <div>
           {greeterContractAddr ? (
             greeterContractAddr
