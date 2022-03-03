@@ -1,7 +1,5 @@
 import { useWeb3React } from '@web3-react/core';
-import { MouseEvent, ReactElement } from 'react';
 import styled from 'styled-components';
-import { Provider } from '../utils/provider';
 
 const StyledButton = styled.button`
   width: 150px;
@@ -12,11 +10,11 @@ const StyledButton = styled.button`
   place-self: center;
 `;
 
-export function SignMessage(): ReactElement {
-  const context = useWeb3React<Provider>();
+export function SignMessage() {
+  const context = useWeb3React();
   const { account, active, library } = context;
 
-  function handleSignMessage(event: MouseEvent<HTMLButtonElement>): void {
+  function handleSignMessage(event) {
     event.preventDefault();
 
     if (!library || !account) {
@@ -24,14 +22,11 @@ export function SignMessage(): ReactElement {
       return;
     }
 
-    async function signMessage(
-      library: Provider,
-      account: string
-    ): Promise<void> {
+    async function signMessage(library, account) {
       try {
         const signature = await library.getSigner(account).signMessage('👋');
         window.alert(`Success!\n\n${signature}`);
-      } catch (error: any) {
+      } catch (error) {
         window.alert(
           'Error!' + (error && error.message ? `\n\n${error.message}` : '')
         );

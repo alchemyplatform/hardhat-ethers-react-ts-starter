@@ -20,3 +20,6 @@ gasReporterOutput.json
 # VS Code
 vscode-user-settings.json
 vscode-workspace-settings.json
+
+# Mac OS X
+.DS_Store

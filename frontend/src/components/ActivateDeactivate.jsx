@@ -1,23 +1,17 @@
-import { AbstractConnector } from '@web3-react/abstract-connector';
+
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core';
 import {
   NoEthereumProviderError,
   UserRejectedRequestError
 } from '@web3-react/injected-connector';
-import { MouseEvent, ReactElement, useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { injected } from '../utils/connectors';
 import { useEagerConnect, useInactiveListener } from '../utils/hooks';
-import { Provider } from '../utils/provider';
 
-type ActivateFunction = (
-  connector: AbstractConnector,
-  onError?: (error: Error) => void,
-  throwErrors?: boolean
-) => Promise<void>;
 
-function getErrorMessage(error: Error): string {
-  let errorMessage: string;
+function getErrorMessage(error) {
+  let errorMessage;
 
   switch (error.constructor) {
     case NoEthereumProviderError:
@@ -61,16 +55,16 @@ const StyledDeactivateButton = styled.button`
   cursor: pointer;
 `;
 
-function Activate(): ReactElement {
-  const context = useWeb3React<Provider>();
+function Activate() {
+  const context = useWeb3React();
   const { activate, active } = context;
 
-  const [activating, setActivating] = useState<boolean>(false);
+  const [activating, setActivating] = useState(false);
 
-  function handleActivate(event: MouseEvent<HTMLButtonElement>): void {
+  function handleActivate(event) {
     event.preventDefault();
 
-    async function _activate(activate: ActivateFunction): Promise<void> {
+    async function _activate(activate) {
       setActivating(true);
       await activate(injected);
       setActivating(false);
@@ -101,11 +95,11 @@ function Activate(): ReactElement {
   );
 }
 
-function Deactivate(): ReactElement {
-  const context = useWeb3React<Provider>();
+function Deactivate() {
+  const context = useWeb3React();
   const { deactivate, active } = context;
 
-  function handleDeactivate(event: MouseEvent<HTMLButtonElement>): void {
+  function handleDeactivate(event) {
     event.preventDefault();
 
     deactivate();
@@ -125,8 +119,8 @@ function Deactivate(): ReactElement {
   );
 }
 
-export function ActivateDeactivate(): ReactElement {
-  const context = useWeb3React<Provider>();
+export function ActivateDeactivate() {
+  const context = useWeb3React();
   const { error } = context;
 
   if (!!error) {

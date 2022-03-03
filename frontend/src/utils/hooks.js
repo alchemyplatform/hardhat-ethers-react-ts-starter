@@ -1,23 +1,22 @@
 import { useWeb3React } from '@web3-react/core';
 import { useCallback, useEffect, useState } from 'react';
 import { injected } from './connectors';
-import { Provider } from './provider';
 
-export function useEagerConnect(): boolean {
-  const { activate, active } = useWeb3React<Provider>();
+export function useEagerConnect() {
+  const { activate, active } = useWeb3React();
 
   const [tried, setTried] = useState(false);
 
   // use useCallback() and useEffect() hooks together so that tryActivate() will only
   // be called once when attempting eager connection
-  const tryActivate = useCallback((): void => {
+  const tryActivate = useCallback(() => {
     async function _tryActivate() {
       const isAuthorized = await injected.isAuthorized();
 
       if (isAuthorized) {
         try {
           await activate(injected, undefined, true);
-        } catch (error: any) {
+        } catch (error) {
           window.alert(
             'Error!' + (error && error.message ? `\n\n${error.message}` : '')
           );
@@ -30,12 +29,12 @@ export function useEagerConnect(): boolean {
     _tryActivate();
   }, [activate]);
 
-  useEffect((): void => {
+  useEffect(() => {
     tryActivate();
   }, [tryActivate]);
 
   // if the connection worked, wait until we get confirmation of that to flip the flag
-  useEffect((): void => {
+  useEffect(() => {
     if (!tried && active) {
       setTried(true);
     }
@@ -44,24 +43,24 @@ export function useEagerConnect(): boolean {
   return tried;
 }
 
-export function useInactiveListener(suppress: boolean = false): void {
-  const { active, error, activate } = useWeb3React<Provider>();
+export function useInactiveListener(suppress = false) {
+  const { active, error, activate } = useWeb3React();
 
-  useEffect((): (() => void) | undefined => {
-    const { ethereum } = window as any;
+  useEffect(() => {
+    const { ethereum } = window;
 
     if (ethereum && ethereum.on && !active && !error && !suppress) {
-      const handleConnect = (): void => {
+      const handleConnect = () => {
         console.log("Handling 'connect' event");
         activate(injected);
       };
 
-      const handleChainChanged = (chainId: string | number): void => {
-        console.log("Handling 'chainChanged' event with payload", chainId);
+      const handleChainChanged = (chainIdOrNumber) => {
+        console.log("Handling 'chainChanged' event with payload", chainIdOrNumber);
         activate(injected);
       };
 
-      const handleAccountsChanged = (accounts: string[]): void => {
+      const handleAccountsChanged = (accounts) => {
         console.log("Handling 'accountsChanged' event with payload", accounts);
         if (accounts.length > 0) {
           activate(injected);
@@ -73,7 +72,7 @@ export function useInactiveListener(suppress: boolean = false): void {
       ethereum.on('accountsChanged', handleAccountsChanged);
 
       // cleanup function
-      return (): void => {
+      return () => {
         if (ethereum.removeListener) {
           ethereum.removeListener('connect', handleConnect);
           ethereum.removeListener('chainChanged', handleChainChanged);

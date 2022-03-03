@@ -1,15 +1,11 @@
 import { useWeb3React } from '@web3-react/core';
-import { Contract, ethers, Signer } from 'ethers';
+import { ethers } from 'ethers';
 import {
-  ChangeEvent,
-  MouseEvent,
-  ReactElement,
   useEffect,
   useState
 } from 'react';
 import styled from 'styled-components';
 import GreeterArtifact from '../artifacts/contracts/Greeter.sol/Greeter.json';
-import { Provider } from '../utils/provider';
 import { SectionDivider } from './SectionDivider';
 
 const StyledDeployContractButton = styled.button`
@@ -47,17 +43,17 @@ const StyledButton = styled.button`
   cursor: pointer;
 `;
 
-export function Greeter(): ReactElement {
-  const context = useWeb3React<Provider>();
+export function Greeter() {
+  const context = useWeb3React();
   const { library, active } = context;
 
-  const [signer, setSigner] = useState<Signer>();
-  const [greeterContract, setGreeterContract] = useState<Contract>();
-  const [greeterContractAddr, setGreeterContractAddr] = useState<string>('');
-  const [greeting, setGreeting] = useState<string>('');
-  const [greetingInput, setGreetingInput] = useState<string>('');
+  const [signer, setSigner] = useState();
+  const [greeterContract, setGreeterContract] = useState();
+  const [greeterContractAddr, setGreeterContractAddr] = useState('');
+  const [greeting, setGreeting] = useState('');
+  const [greetingInput, setGreetingInput] = useState('');
 
-  useEffect((): void => {
+  useEffect(() => {
     if (!library) {
       setSigner(undefined);
       return;
@@ -66,12 +62,12 @@ export function Greeter(): ReactElement {
     setSigner(library.getSigner());
   }, [library]);
 
-  useEffect((): void => {
+  useEffect(() => {
     if (!greeterContract) {
       return;
     }
 
-    async function getGreeting(greeterContract: Contract): Promise<void> {
+    async function getGreeting(greeterContract) {
       const _greeting = await greeterContract.greet();
 
       if (_greeting !== greeting) {
@@ -82,7 +78,7 @@ export function Greeter(): ReactElement {
     getGreeting(greeterContract);
   }, [greeterContract, greeting]);
 
-  function handleDeployContract(event: MouseEvent<HTMLButtonElement>) {
+  function handleDeployContract(event) {
     event.preventDefault();
 
     // only deploy the Greeter contract one time, when a signer is defined
@@ -90,7 +86,7 @@ export function Greeter(): ReactElement {
       return;
     }
 
-    async function deployGreeterContract(signer: Signer): Promise<void> {
+    async function deployGreeterContract(signer) {
       const Greeter = new ethers.ContractFactory(
         GreeterArtifact.abi,
         GreeterArtifact.bytecode,
@@ -110,7 +106,7 @@ export function Greeter(): ReactElement {
         window.alert(`Greeter deployed to: ${greeterContract.address}`);
 
         setGreeterContractAddr(greeterContract.address);
-      } catch (error: any) {
+      } catch (error) {
         window.alert(
           'Error!' + (error && error.message ? `\n\n${error.message}` : '')
         );
@@ -120,12 +116,12 @@ export function Greeter(): ReactElement {
     deployGreeterContract(signer);
   }
 
-  function handleGreetingChange(event: ChangeEvent<HTMLInputElement>): void {
+  function handleGreetingChange(event) {
     event.preventDefault();
     setGreetingInput(event.target.value);
   }
 
-  function handleGreetingSubmit(event: MouseEvent<HTMLButtonElement>): void {
+  function handleGreetingSubmit(event) {
     event.preventDefault();
 
     if (!greeterContract) {
@@ -138,7 +134,7 @@ export function Greeter(): ReactElement {
       return;
     }
 
-    async function submitGreeting(greeterContract: Contract): Promise<void> {
+    async function submitGreeting(greeterContract) {
       try {
         const setGreetingTxn = await greeterContract.setGreeting(greetingInput);
 
@@ -150,7 +146,7 @@ export function Greeter(): ReactElement {
         if (newGreeting !== greeting) {
           setGreeting(newGreeting);
         }
-      } catch (error: any) {
+      } catch (error) {
         window.alert(
           'Error!' + (error && error.message ? `\n\n${error.message}` : '')
         );

@@ -1,4 +1,3 @@
-import { ReactElement } from 'react';
 import styled from 'styled-components';
 import { ActivateDeactivate } from './components/ActivateDeactivate';
 import { Greeter } from './components/Greeter';
@@ -11,7 +10,7 @@ const StyledAppDiv = styled.div`
   grid-gap: 20px;
 `;
 
-export function App(): ReactElement {
+export function App() {
   return (
     <StyledAppDiv>
       <ActivateDeactivate />

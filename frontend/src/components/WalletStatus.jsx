@@ -1,10 +1,7 @@
 import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
-import { ReactElement, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Provider } from '../utils/provider';
-
-type CleanupFunction = (() => void) | undefined;
 
 const StyledWalletStatusDiv = styled.div`
   display: grid;
@@ -19,8 +16,8 @@ const StyledStatusIcon = styled.h1`
   margin: 0px;
 `;
 
-function ChainId(): ReactElement {
-  const { chainId } = useWeb3React<Provider>();
+function ChainId() {
+  const { chainId } = useWeb3React();
 
   return (
     <>
@@ -35,26 +32,26 @@ function ChainId(): ReactElement {
   );
 }
 
-function BlockNumber(): ReactElement {
-  const { chainId, library } = useWeb3React<Provider>();
+function BlockNumber() {
+  const { chainId, library } = useWeb3React();
 
-  const [blockNumber, setBlockNumber] = useState<number>();
+  const [blockNumber, setBlockNumber] = useState();
 
-  useEffect((): CleanupFunction => {
+  useEffect(() => {
     if (!library) {
       return;
     }
 
     let stale = false;
 
-    async function getBlockNumber(library: Provider): Promise<void> {
+    async function getBlockNumber(library) {
       try {
-        const blockNumber: number = await library.getBlockNumber();
+        const blockNumber = await library.getBlockNumber();
 
         if (!stale) {
           setBlockNumber(blockNumber);
         }
-      } catch (error: any) {
+      } catch (error) {
         if (!stale) {
           setBlockNumber(undefined);
         }
@@ -70,7 +67,7 @@ function BlockNumber(): ReactElement {
     library.on('block', setBlockNumber);
 
     // cleanup function
-    return (): void => {
+    return () => {
       stale = true;
       library.removeListener('block', setBlockNumber);
       setBlockNumber(undefined);
@@ -90,8 +87,8 @@ function BlockNumber(): ReactElement {
   );
 }
 
-function Account(): ReactElement {
-  const { account } = useWeb3React<Provider>();
+function Account() {
+  const { account } = useWeb3React();
 
   return (
     <>
@@ -114,12 +111,11 @@ function Account(): ReactElement {
   );
 }
 
-function Balance(): ReactElement {
-  const { account, library, chainId } = useWeb3React<Provider>();
+function Balance() {
+  const { account, library, chainId } = useWeb3React();
+  const [balance, setBalance] = useState();
 
-  const [balance, setBalance] = useState<ethers.BigNumber>();
-
-  useEffect((): CleanupFunction => {
+  useEffect(() => {
     if (typeof account === 'undefined' || account === null || !library) {
       return;
     }
@@ -127,16 +123,16 @@ function Balance(): ReactElement {
     let stale = false;
 
     async function getBalance(
-      library: Provider,
-      account: string
-    ): Promise<void> {
-      const balance: ethers.BigNumber = await library.getBalance(account);
+      library,
+      account
+    ) {
+      const balance = await library.getBalance(account);
 
       try {
         if (!stale) {
           setBalance(balance);
         }
-      } catch (error: any) {
+      } catch (error) {
         if (!stale) {
           setBalance(undefined);
 
@@ -151,14 +147,14 @@ function Balance(): ReactElement {
 
     // create a named balancer handler function to fetch the balance each block. in the
     // cleanup function use the fucntion name to remove the listener
-    const getBalanceHandler = (): void => {
+    const getBalanceHandler = () => {
       getBalance(library, account);
     };
 
     library.on('block', getBalanceHandler);
 
     // cleanup function
-    return (): void => {
+    return () => {
       stale = true;
       library.removeListener('block', getBalanceHandler);
       setBalance(undefined);
@@ -185,12 +181,12 @@ function Balance(): ReactElement {
 }
 
 // nonce: aka 'transaction count'
-function NextNonce(): ReactElement {
-  const { account, library, chainId } = useWeb3React<Provider>();
+function NextNonce() {
+  const { account, library, chainId } = useWeb3React();
 
-  const [nextNonce, setNextNonce] = useState<number>();
+  const [nextNonce, setNextNonce] = useState();
 
-  useEffect((): CleanupFunction => {
+  useEffect(() => {
     if (typeof account === 'undefined' || account === null || !library) {
       return;
     }
@@ -198,16 +194,16 @@ function NextNonce(): ReactElement {
     let stale = false;
 
     async function getNextNonce(
-      library: Provider,
-      account: string
-    ): Promise<void> {
-      const nextNonce: number = await library.getTransactionCount(account);
+      library,
+      account
+    ) {
+      const nextNonce = await library.getTransactionCount(account);
 
       try {
         if (!stale) {
           setNextNonce(nextNonce);
         }
-      } catch (error: any) {
+      } catch (error) {
         if (!stale) {
           setNextNonce(undefined);
 
@@ -222,14 +218,14 @@ function NextNonce(): ReactElement {
 
     // create a named next nonce handler function to fetch the next nonce each block.
     // in the cleanup function use the fucntion name to remove the listener
-    const getNextNonceHandler = (): void => {
+    const getNextNonceHandler = () => {
       getNextNonce(library, account);
     };
 
     library.on('block', getNextNonceHandler);
 
     // cleanup function
-    return (): void => {
+    return () => {
       stale = true;
       setNextNonce(undefined);
     };
@@ -248,15 +244,15 @@ function NextNonce(): ReactElement {
   );
 }
 
-function StatusIcon(): ReactElement {
-  const { active, error } = useWeb3React<Provider>();
+function StatusIcon() {
+  const { active, error } = useWeb3React();
 
   return (
     <StyledStatusIcon>{active ? '🟢' : error ? '🔴' : '🟠'}</StyledStatusIcon>
   );
 }
 
-export function WalletStatus(): ReactElement {
+export function WalletStatus() {
   return (
     <StyledWalletStatusDiv>
       <ChainId />
