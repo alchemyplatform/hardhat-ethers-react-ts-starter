@@ -23,7 +23,7 @@ Pull this project down from GitHub, cd into the project directory and run the fo
 
 ```shell
 yarn
-yarn compile
+yarn hardhat compile
 yarn hardhat node
 ```
 
