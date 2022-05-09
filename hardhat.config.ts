@@ -17,12 +17,12 @@ const config: HardhatUserConfig = {
     artifacts: './frontend/src/artifacts'
   },
   networks: {
-    hardhat: {
-      mining: {
-        auto: false,
-        interval: 1000
-      }
-    },
+    // hardhat: {
+    //   mining: {
+    //     auto: false,
+    //     interval: 1000
+    //   }
+    // },
     ropsten: {
       url: process.env.ROPSTEN_URL || '',
       accounts:
